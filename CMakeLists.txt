@@ -6,6 +6,8 @@ option(RPI "Set to ON to enable the Raspberry PI memory and audio options" ${RPI
 option(OMX "Set to On to enable OMXPlayer for video snapshots" ${OMX})
 option(CEC "Set to ON to enable CEC" ${CEC})
 option(PROFILING "Set to ON to enable profiling" ${PROFILING})
+option(USE_VLC_VIDEO_COMPONENT "Set to ON to build the vlc video player component" ${USE_VLC_VIDEO_COMPONENT})
+option(USE_FFMPEG_VIDEO_COMPONENT "Set to ON to build the ffmpeg video player component" ${USE_FFMPEG_VIDEO_COMPONENT})
 
 # GLES implementation overrides
 option(USE_MESA_GLES "Set to ON to select the MESA OpenGL ES driver" ${USE_MESA_GLES})
@@ -92,8 +94,13 @@ find_package(Freetype REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(CURL REQUIRED)
-find_package(VLC REQUIRED)
 find_package(RapidJSON REQUIRED)
+
+if(USE_VLC_VIDEO_COMPONENT)
+    find_package(VLC REQUIRED)
+elseif(USE_FFMPEG_VIDEO_COMPONENT)
+    find_package(ffmpeg REQUIRED)
+endif()
 
 #add libCEC support
 if(CEC)
@@ -166,11 +173,20 @@ set(COMMON_INCLUDE_DIRS
     ${FreeImage_INCLUDE_DIRS}
     ${SDL2_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIR}
-    ${VLC_INCLUDE_DIR}
     ${RAPIDJSON_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/external
     ${CMAKE_CURRENT_SOURCE_DIR}/es-core/src
 )
+
+if(USE_VLC_VIDEO_COMPONENT)
+    LIST(APPEND COMMON_INCLUDE_DIRS
+        ${VLC_INCLUDE_DIR}
+    )
+elseif(USE_FFMPEG_VIDEO_COMPONENT)
+    LIST(APPEND COMMON_INCLUDE_DIRS
+        ${FFMPEG_INCLUDE_DIRS}
+    )
+endif()
 
 if(${GLSystem} MATCHES "Desktop OpenGL")
         LIST(APPEND COMMON_INCLUDE_DIRS
@@ -204,10 +220,19 @@ set(COMMON_LIBRARIES
     ${FreeImage_LIBRARIES}
     ${SDL2_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${VLC_LIBRARIES}
     pugixml
     nanosvg
 )
+
+if(USE_VLC_VIDEO_COMPONENT)
+    LIST(APPEND COMMON_LIBRARIES
+        ${VLC_LIBRARIES}
+    )
+elseif(USE_FFMPEG_VIDEO_COMPONENT)
+    LIST(APPEND COMMON_LIBRARIES
+        ${FFMPEG_LIBRARIES}
+    )
+endif()
 
 #add libCEC_LIBRARIES
 if(DEFINED libCEC_FOUND)

@@ -47,7 +47,6 @@ set(CORE_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/TextEditComponent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoComponent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoPlayerComponent.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoVlcComponent.h
 
 	# Guis
 	${CMAKE_CURRENT_SOURCE_DIR}/src/guis/GuiDetectDevice.h
@@ -123,7 +122,6 @@ set(CORE_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/TextEditComponent.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoComponent.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoPlayerComponent.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoVlcComponent.cpp
 
 	# Guis
 	${CMAKE_CURRENT_SOURCE_DIR}/src/guis/GuiDetectDevice.cpp
@@ -160,6 +158,22 @@ set(CORE_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/ThreadPool.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/utils/TimeUtil.cpp
 )
+
+if(USE_VLC_VIDEO_COMPONENT)
+	LIST(APPEND CORE_HEADERS
+		${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoVlcComponent.h
+	)
+	LIST(APPEND CORE_SOURCES
+		${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoVlcComponent.cpp
+	)
+elseif(USE_FFMPEG_VIDEO_COMPONENT)
+	LIST(APPEND CORE_HEADERS
+		${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoFfmpegComponent.h
+	)
+	LIST(APPEND CORE_SOURCES
+		${CMAKE_CURRENT_SOURCE_DIR}/src/components/VideoFfmpegComponent.cpp
+	)
+endif()
 
 include_directories(${COMMON_INCLUDE_DIRS})
 add_library(es-core STATIC ${CORE_SOURCES} ${CORE_HEADERS})
